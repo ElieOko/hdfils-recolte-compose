@@ -1,5 +1,8 @@
 package com.partners.hdfils_recolte.domain.models
 
-data class User(
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class UserSerializable(
     val matricule : String
 )

@@ -27,9 +27,12 @@ ktorClientAndroid = "2.3.12"
 ktorSerializationKotlinxJson = "2.3.10"
 lifecycleExtensions = "2.2.0"
 lifecycleRuntimeKtxVersion = "2.8.7"
-
+navigationCompose = "2.8.9"
+pagerVersion = "1.7.8"
 
 [libraries]
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+foundation-pager = { group = "androidx.compose.foundation", name = "foundation", version.ref = "pagerVersion" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensions" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
