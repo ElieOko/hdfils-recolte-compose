@@ -39,7 +39,6 @@ import java.util.logging.Logger
 
 
 private const val NETWORK_TIME_OUT = 6_000L
-
 val httpClientAndroid = HttpClient(Android) {
     install(ContentNegotiation) {
         json(
@@ -71,17 +70,7 @@ val httpClientAndroid = HttpClient(Android) {
     }
 }
 class ClientKtor {
-
-//    private val myHttpClient = HttpClient(Android) {
-//        install(HttpTimeout) {
-//            requestTimeoutMillis = 10000 // 10 seconds
-//        }
-//        install(ContentNegotiation) {
-//            json()
-//        }
-//    }
-
-    suspend fun postData(route: String, data: UserSerializable): HttpResponse {
+    suspend fun postData(route: String, data: Any): HttpResponse {
         return httpClientAndroid.post {
             url {
                 protocol = if (IS_PROD) URLProtocol.HTTPS else URLProtocol.HTTP
@@ -95,7 +84,6 @@ class ClientKtor {
             setBody(data) // Serialize the body
         }
     }
-
     suspend fun getData(route: String): HttpResponse {
         return httpClientAndroid.get {
             url {

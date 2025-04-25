@@ -1,8 +1,9 @@
-package com.partners.hdfils_agent.domain.connectivity
+package com.partners.hdfils_recolte.domain.connectivity
 
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.partners.hdfils_recolte.domain.connectivity.ConnectivityObserver
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 

@@ -1,6 +1,6 @@
 package com.partners.hdfils_recolte.presentation.ui.pages
 
-import android.widget.Toast
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,12 +22,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,53 +42,58 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.partners.hdfils_recolte.data.remote.ClientKtor
 import com.partners.hdfils_recolte.data.remote.ResponseAPI
-import com.partners.hdfils_recolte.domain.models.UserSerializable
 import io.ktor.client.call.body
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.partners.hdfils_recolte.R
+import com.partners.hdfils_recolte.data.remote.ResponseAPIGeneric
+import com.partners.hdfils_recolte.data.shared.StoreData
+import com.partners.hdfils_recolte.data.utils.EndPoint.clientAuth
+import com.partners.hdfils_recolte.data.utils.isValidPhoneNumber
+import com.partners.hdfils_recolte.domain.models.Address
+import com.partners.hdfils_recolte.domain.models.Client
+import com.partners.hdfils_recolte.domain.models.ClientAuth
+import com.partners.hdfils_recolte.domain.route.ScreenRoute
+import com.partners.hdfils_recolte.presentation.ui.components.MAlertDialog
 import com.partners.hdfils_recolte.presentation.ui.components.Space
 import com.partners.hdfils_recolte.presentation.ui.theme.AnimatedBackgroundShapes
 
 @Composable
-fun AuthPage(){
-    AuthPageBody()
+fun AuthPage(navC: NavHostController, isConnected: Boolean) {
+    AuthPageBody(navC,isConnected)
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun AuthPageBody(){
+fun AuthPageBody(navC: NavHostController, isConnected: Boolean) {
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    var matricule by remember { mutableStateOf("") }
+    var telephone by remember { mutableStateOf("") }
+    var avenue by remember { mutableStateOf("") }
     var isAnimating by remember { mutableStateOf(false) }
     var isActive by remember { mutableStateOf(true) }
-
-    val gradient = Brush.verticalGradient(
-        colors = listOf(Color(0xFF6C63FF), Color(0xFFF5F5F5)),
-        startY = 0f,
-        endY = 1000f
-    )
-
+    var msg by remember { mutableStateOf("") }
+    var titleMsg by remember { mutableStateOf("Erreur") }
+    var isShow by remember { mutableStateOf(false) }
+    val maxLength = 10 // Longueur maximale
+    val gradient = Brush.verticalGradient(colors = listOf(Color(0xFF6C63FF), Color(0xFFF5F5F5)), startY = 0f, endY = 1000f)
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Ajouter les formes en arrière-plan
         AnimatedBackgroundShapes()
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-            ,
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -131,9 +134,13 @@ fun AuthPageBody(){
                     Spacer(modifier = Modifier.height(20.dp))
 
                     OutlinedTextField(
-                        value = matricule,
-                        onValueChange = { matricule = it },
-                        label = { Text("Identifiant") },
+                        value = telephone,
+                        onValueChange = {
+                            if (it.length <= maxLength) {
+                                telephone = it
+                            }
+                             },
+                        label = { Text("Téléphone") },
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.house),
@@ -155,38 +162,117 @@ fun AuthPageBody(){
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(10.dp)
                     )
-
+                    Spacer(modifier = Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = avenue,
+                        onValueChange = { avenue = it },
+                        label = { Text("Avenue") },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.house),
+                                contentDescription = null,
+                                modifier = Modifier.size(25.dp),
+                                tint = Color.White
+                            )
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            focusedLabelColor = Color.White,
+                            unfocusedLabelColor = Color.White,
+                            cursorColor = Color.White,
+                            focusedLeadingIconColor = Color.White,
+                            unfocusedLeadingIconColor = Color.White
+                        ),
+                        textStyle = TextStyle(color = Color.White),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(10.dp)
+                    )
                     Space(y=20)
                     Button(
                         onClick = {
-                            coroutineScope.launch {
-                                isActive = false
-                                delay(6000)
-                                val response = ClientKtor().postData("user/login",UserSerializable(matricule))
-                                val status = response.status.value
-                                when(status){
-                                    in 200..299 ->{
-                                        isActive = true
-                                        val res = response.body<ResponseAPI>()
-                                        Toast.makeText(context,res.message,Toast.LENGTH_LONG).show()
+                            if(!isValidPhoneNumber(phoneNumber = telephone)) {
+                                isShow = true
+                                msg = "Ce numero est invalide en republique democratique du congo"
+                            }
+                            if(avenue.isEmpty()){
+                                isShow = true
+                                msg = "Le nom de l'avenue n'est pas renseigner"
+                            }
+                            if(isValidPhoneNumber(phoneNumber = telephone) && avenue.isNotEmpty() ){
+                                if(isConnected){
+                                    coroutineScope.launch {
+                                        isActive = false
+                                        delay(3000)
+                                        val response = ClientKtor().postData(clientAuth,
+                                            ClientAuth(telephone = telephone, avenue = avenue)
+                                        )
+                                        val status = response.status.value
+                                        when(status){
+                                            in 200..299 ->{
+                                                isActive = true
+                                                val res = response.body<ResponseAPI>()
+                                                scope.launch {
+                                                    StoreData(context).getDataClient.collect{
+                                                        if(it != null){
+                                                            if (it.telephone == telephone && it.address_client[0].avenue == avenue){
+                                                                //
+                                                            }
+                                                            else{
+                                                                StoreData(context).delete()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                scope.launch {
+                                                    StoreData(context).saveDataClientAuth(ClientAuth(telephone,avenue))
+                                                    StoreData(context).saveDataClient(
+                                                        res.client?.id?.let {
+                                                            Client(
+                                                                id = it,
+                                                                nom = res.client.nom,
+                                                                prenom = res.client.prenom,
+                                                                telephone = res.client.telephone,
+                                                                address_client = listOf<Address>(Address(
+                                                                    commune_id =  res.client.address_client[0].commune_id,
+                                                                    avenue = res.client.address_client[0].avenue,
+                                                                    quartier = res.client.address_client[0].quartier,
+                                                                    numero_parcelle = res.client.address_client[0].numero_parcelle
+                                                                )),
+                                                            )
+                                                        }
+                                                    )
+                                                    navC.navigate(route = ScreenRoute.Home.name){
+                                                        popUpTo(navC.graph.id){
+                                                            inclusive = true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            in 500..599 ->{
+                                                isActive = true
+                                                msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
+                                                isShow = true
+                                            }
+                                            in 400..499 ->{
+                                                isActive = true
+                                                val res = response.body<ResponseAPIGeneric>()
+                                                msg = res.message
+                                                isShow = true
+                                            }
+                                        }
                                     }
-                                    in 500..599 ->{
-                                        isActive = true
-                                        Toast.makeText(context,"Erreur serveur",Toast.LENGTH_LONG).show()
-                                    }
-                                    in 400..499 ->{
-                                        isActive = true
-                                        val res = response.body<ResponseAPI>()
-                                        Toast.makeText(context,res.message,Toast.LENGTH_LONG).show()
-                                    }
-
+                                }
+                                else{
+                                    msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
+                                    titleMsg = "Problème de connexion"
+                                    isShow = true
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
                             containerColor =  Color.Black,
-//                            contentColor = Color(0xFF6C63FF),
                             disabledContentColor = Color(0xFF080624),
                             disabledContainerColor = Color(0xFF080624)
                         ),
@@ -195,16 +281,16 @@ fun AuthPageBody(){
                     ) {
                         Text(text = if(isActive) "Se connecter" else "Chargement...", fontSize = 16.sp, color = Color.White)
                     }
-
-
+                    if(isShow){
+                        MAlertDialog(
+                            dialogTitle = "Erreur",
+                            dialogText =  msg,
+                            onDismissRequest = {
+                                isShow = false
+                            }
+                        )
+                    }
                     Space(y=30)
-//                    TextButton(onClick = { /* Naviguer vers l'écran d'inscription */ }) {
-//                        Text(
-//                            text = "Pas encore de compte ? Inscrivez-vous",
-//                            color = Color.White,
-//                            fontSize = 14.sp
-//                        )
-//                    }
                 }
             }
         }
@@ -223,5 +309,5 @@ fun AuthPageBody(){
 @Composable
 @Preview
 fun AuthPagePreview(){
-    AuthPageBody()
+//    AuthPageBody(navC, isConnected)
 }

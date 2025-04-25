@@ -1,4 +1,4 @@
-package com.partners.hdfils_agent.domain.connectivity
+package com.partners.hdfils_recolte.domain.connectivity
 
 
 import kotlinx.coroutines.flow.Flow

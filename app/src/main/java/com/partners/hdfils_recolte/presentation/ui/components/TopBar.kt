@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -17,8 +18,11 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -38,7 +42,9 @@ import com.partners.hdfils_recolte.R
 
 @Composable
 fun TopBar(
-    username: String = "elieoko"
+    username: String = "elieoko",
+    onclick : () -> Unit = {},
+    onclickSignout : () -> Unit = {},
 ){
     val rainbowColorsBrush = remember {
         Brush.sweepGradient(
@@ -72,11 +78,15 @@ fun TopBar(
                 Space(y=1)
                 Label("@$username", modifier = Modifier.absoluteOffset(x=7.dp))
             }
-//            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-//                MIcon(Icons.Default.Notifications)
-//                Space(x = 10)
-//                MIcon(Icons.Default.Create)
-//            }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = onclickSignout) {
+                    Icon(painterResource(R.drawable.signout), contentDescription = null, Modifier.size(30.dp), tint = Color.White)
+                }
+               IconButton(onClick = onclick) {
+                   Icon(painterResource(R.drawable.transfert), contentDescription = null, Modifier.size(30.dp), tint = Color.White)
+               }
+            }
+
         }
     }
 
