@@ -71,7 +71,7 @@ import com.partners.hdfils_recolte.presentation.ui.components.Circular
 import com.partners.hdfils_recolte.presentation.ui.components.Label
 import com.partners.hdfils_recolte.presentation.ui.components.MAlertDialog
 import com.partners.hdfils_recolte.presentation.ui.components.MButtonIcon
-import com.partners.hdfils_recolte.presentation.ui.components.ModernCarousel
+//import com.partners.hdfils_recolte.presentation.ui.components.ModernCarousel
 import com.partners.hdfils_recolte.presentation.ui.components.Space
 import io.ktor.client.call.body
 import kotlinx.coroutines.delay
@@ -538,7 +538,7 @@ fun HomePageBody(navC: NavHostController, isConnected: Boolean) {
                }
             }
             Space(y = 20)
-            ModernCarousel()
+            //ModernCarousel()
             if(isShow){
                 MAlertDialog(
                     dialogTitle = titleMsg,
