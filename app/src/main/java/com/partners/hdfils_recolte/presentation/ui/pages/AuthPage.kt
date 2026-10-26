@@ -215,7 +215,7 @@ fun AuthPageBody(navC: NavHostController, isConnected: Boolean) {
                                                 scope.launch {
                                                     StoreData(context).getDataClient.collect{
                                                         if(it != null){
-                                                            if (it.telephone == telephone && it.address_client[0].avenue == avenue){
+                                                            if (it.telephone == telephone && it.address_client?.get(0)?.avenue == avenue){
                                                                 //
                                                             }
                                                             else{
@@ -234,10 +234,11 @@ fun AuthPageBody(navC: NavHostController, isConnected: Boolean) {
                                                                 prenom = res.client.prenom,
                                                                 telephone = res.client.telephone,
                                                                 address_client = listOf<Address>(Address(
-                                                                    commune_id =  res.client.address_client[0].commune_id,
-                                                                    avenue = res.client.address_client[0].avenue,
-                                                                    quartier = res.client.address_client[0].quartier,
-                                                                    numero_parcelle = res.client.address_client[0].numero_parcelle
+                                                                    commune_id = res.client.address_client?.get(0)?.commune_id
+                                                                        ?: 0,
+                                                                    avenue = res.client.address_client?.get(0)?.avenue?:"",
+                                                                    quartier = res.client.address_client?.get(0)?.quartier?:"",
+                                                                    numero_parcelle = res.client.address_client?.get(0)?.numero_parcelle?:""
                                                                 )),
                                                             )
                                                         }

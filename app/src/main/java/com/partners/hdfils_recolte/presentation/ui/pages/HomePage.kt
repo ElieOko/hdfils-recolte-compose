@@ -217,21 +217,24 @@ fun HomePageBody(navC: NavHostController, isConnected: Boolean) {
                             Row(Modifier.fillMaxWidth()) {
                                 Column {
                                     Label("Quartier", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].quartier, color = Color.White.copy(
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.quartier?:"", color = Color.White.copy(
                                         alpha = 0.5f
                                     ))
                                 }
                                 Space(x=15)
                                 Column {
                                     Label("Avenue", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].avenue,color = Color.White.copy(
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.avenue?:"",color = Color.White.copy(
                                         alpha = 0.5f
                                     ))
                                 }
                                 Space(x=15)
                                 Column {
                                     Label("Commune", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].commune_id.toString(), color = Color.White.copy(
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.commune_id.toString(), color = Color.White.copy(
                                         alpha = 0.5f
                                     ))
                                 }
