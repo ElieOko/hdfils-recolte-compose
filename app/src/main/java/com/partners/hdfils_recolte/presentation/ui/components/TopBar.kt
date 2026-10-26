@@ -63,7 +63,7 @@ fun TopBar(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(R.drawable.logo_gris),
+                painter = painterResource(R.drawable.logo_casa),
                 contentScale = ContentScale.Crop,
                 contentDescription = "",
                 modifier = Modifier
@@ -74,7 +74,7 @@ fun TopBar(
                     )
             )
             Column(Modifier.padding(10.dp)) {
-                Label("Kin ezo bonga")
+                Label("CasaClean")
                 Space(y=1)
                 Label("@$username", modifier = Modifier.absoluteOffset(x=7.dp))
             }

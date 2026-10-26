@@ -1,559 +1,320 @@
 package com.partners.hdfils_recolte.presentation.ui.pages
 
-import android.annotation.SuppressLint
-import android.util.Log
-import android.widget.Toast
-import androidx.compose.foundation.border
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.center
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RadialGradientShader
-import androidx.compose.ui.graphics.Shader
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.toLowerCase
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.partners.hdfils_recolte.presentation.ui.components.TopBar
 import com.partners.hdfils_recolte.R
-import com.partners.hdfils_recolte.data.remote.ClientKtor
-import com.partners.hdfils_recolte.data.remote.ResponseAPI
-import com.partners.hdfils_recolte.data.remote.ResponseAPIGeneric
-import com.partners.hdfils_recolte.data.remote.ResponseAPITrash
-import com.partners.hdfils_recolte.data.shared.StoreData
-import com.partners.hdfils_recolte.data.utils.EndPoint.clientAuth
-import com.partners.hdfils_recolte.data.utils.EndPoint.trashAction
-import com.partners.hdfils_recolte.data.utils.EndPoint.trashClean
-import com.partners.hdfils_recolte.domain.models.Address
 import com.partners.hdfils_recolte.domain.models.Client
-import com.partners.hdfils_recolte.domain.models.ClientAuth
-import com.partners.hdfils_recolte.domain.models.Trash
 import com.partners.hdfils_recolte.domain.models.TrashClean
+import com.partners.hdfils_recolte.domain.models.TrashTone
+import com.partners.hdfils_recolte.domain.models.addresses
+import com.partners.hdfils_recolte.domain.models.communeLabel
+import com.partners.hdfils_recolte.domain.models.displayName
+import com.partners.hdfils_recolte.domain.models.subscription
+import com.partners.hdfils_recolte.domain.models.trashStatus
 import com.partners.hdfils_recolte.domain.route.ScreenRoute
-import com.partners.hdfils_recolte.presentation.ui.components.Circular
-import com.partners.hdfils_recolte.presentation.ui.components.Label
+import com.partners.hdfils_recolte.presentation.state.DialogKind
+import com.partners.hdfils_recolte.presentation.state.HomeEvent
+import com.partners.hdfils_recolte.presentation.state.HomeViewModel
+import com.partners.hdfils_recolte.presentation.ui.components.AppLogo
+import com.partners.hdfils_recolte.presentation.ui.components.CasaCarousel
+import com.partners.hdfils_recolte.presentation.ui.components.InfoRow
 import com.partners.hdfils_recolte.presentation.ui.components.MAlertDialog
 import com.partners.hdfils_recolte.presentation.ui.components.MButtonIcon
-import com.partners.hdfils_recolte.presentation.ui.components.ModernCarousel
-import com.partners.hdfils_recolte.presentation.ui.components.Space
-import io.ktor.client.call.body
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import java.util.Locale
+import com.partners.hdfils_recolte.presentation.ui.components.PrimaryButton
+import com.partners.hdfils_recolte.presentation.ui.components.SectionLabel
+import com.partners.hdfils_recolte.presentation.ui.components.SubscriptionBlock
+import com.partners.hdfils_recolte.presentation.ui.components.formatApiDate
+import com.partners.hdfils_recolte.presentation.ui.theme.AppBackground
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlue
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlueDark
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlueDeep
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlueLight
+import com.partners.hdfils_recolte.presentation.ui.theme.Danger
+import com.partners.hdfils_recolte.presentation.ui.theme.Ink
+import com.partners.hdfils_recolte.presentation.ui.theme.InkMuted
+import com.partners.hdfils_recolte.presentation.ui.theme.Success
+import com.partners.hdfils_recolte.presentation.ui.theme.Warning
 
 @Composable
 fun HomePage(navC: NavHostController, isConnected: Boolean) {
-    HomePageBody(navC,isConnected)
-}
-val largeRadialGradient = object : ShaderBrush() {
-    override fun createShader(size: Size): Shader {
-        val biggerDimension = maxOf(size.height, size.width)
-        return RadialGradientShader(
-            colors = listOf(  Color(0xFF214A60),
-                Color(0xFF1B5A8C),
-                Color(0xFF2B4B4F),
-                Color(0xFF166B6E)),
-            center = size.center,
-            radius = biggerDimension / 2f,
-            colorStops = listOf(0f, 0.95f)
-        )
-    }
-}
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
-@Composable
-fun HomePageBody(navC: NavHostController, isConnected: Boolean) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    var stateTrash by remember { mutableStateOf(false) }
-    var isActive by remember { mutableStateOf(true) }
-    var isShow by remember { mutableStateOf(false) }
-    var msg by remember { mutableStateOf("") }
-    var titleMsg by remember { mutableStateOf("Erreur") }
-    val clients = remember { mutableStateListOf<Client>() }
-    val trashCleaner = remember { mutableStateListOf<TrashClean?>() }
-    val coroutineScope = rememberCoroutineScope()
-    var onclick : ()-> Unit = {isShow = false}
+    val viewModel: HomeViewModel = viewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    Scaffold(containerColor =  Color(0xFF6E889D).copy(0.2f)) {
-        Column {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth().padding(0.dp),
-                shape = RoundedCornerShape(bottomEnd = 45.dp, bottomStart = 45.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xDC3A57E7).copy(0.7f)
-                )) {
-                    scope.launch {
-                        StoreData(context).getDataTrash.collect{
-                            if (it != null) {
-                                trashCleaner.add(it)
-                            }
-                        }
-                    }
-                    scope.launch {
-                        StoreData(context).getDataClient.collect { client ->
-                            if (client != null) {
-                                clients.add(client)
-                            } // Ajoute le client à la liste
-                        }
-                    }
-                    if (!clients.isEmpty()){
-                        val username = (clients.toList()[0].prenom + clients.toList()[0].nom).lowercase(
-                            Locale.getDefault()
-                        )
-                        TopBar(
-                            username = username,
-                            onclick = {
-                                onclick = {
-                                    isShow = false
-                                }
-                                try {
-                                    if(isConnected){
-                                        isActive = false
-                                        coroutineScope.launch {
-                                            delay(3000)
-                                            val response = ClientKtor().getData("${trashAction}/${clients[0].id}")
-                                            val status = response.status.value
-                                            when(status){
-                                                in 200..299 ->{
-                                                    val res = response.body<ResponseAPITrash>()
-                                                    msg = "Mises à jours effectuer avec succès"
-                                                    titleMsg = "Success"
-                                                    isActive = true
-                                                    isShow = true
-                                                    trashCleaner.add(TrashClean(
-                                                        id = res.data.id,
-                                                        state_trash_id = res.data.state_trash_id,
-                                                        created_at = res.data.created_at,
-                                                        client_id = res.data.client_id))
-                                                    scope.launch {
-                                                        StoreData(context).saveDataTrash(trashCleaner[0])
-                                                    }
-                                                }
-                                                in 500..599 ->{
-                                                    msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
-                                                    isShow = true
-                                                    isActive = true
-                                                }
-
-                                                in 400..499 ->{
-                                                    val res = response.body<ResponseAPIGeneric>()
-                                                    msg = res.message
-                                                    titleMsg     = "Information"
-                                                    isShow = true
-                                                    isActive = true
-                                                }
-
-                                            }
-                                        }
-                                    }
-                                    else{
-                                        titleMsg = "Problème de connexion"
-                                        msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
-                                        isShow = true
-                                    }
-                                }
-                                catch (e : Exception){
-                                    Toast.makeText(context,e.message,Toast.LENGTH_LONG).show()
-                                }
-                            },
-                            onclickSignout = {
-                                isShow = true
-                                titleMsg = "Information"
-                                msg = "Voulez-vous vraiment vous déconnectez ??"
-                                onclick = {
-                                    isShow = false
-                                    navC.navigate(route = ScreenRoute.Auth.name){
-                                        popUpTo(navC.graph.id){
-                                            inclusive = true
-                                        }
-                                    }
-                                }
-                            }
-                        )
-                    }
-                Column(Modifier.padding(1.dp).absoluteOffset(y = (-15).dp)) {
-                    if (!clients.isEmpty()){
-                        Column(Modifier.padding(20.dp)) {
-                            Space(y = 2)
-                            Row(Modifier.fillMaxWidth()) {
-                                Column {
-                                    Label("Quartier", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].quartier, color = Color.White.copy(
-                                        alpha = 0.5f
-                                    ))
-                                }
-                                Space(x=15)
-                                Column {
-                                    Label("Avenue", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].avenue,color = Color.White.copy(
-                                        alpha = 0.5f
-                                    ))
-                                }
-                                Space(x=15)
-                                Column {
-                                    Label("Commune", size = 16, fontWeight = FontWeight.Bold)
-                                    Label(clients.toList()[0].address_client[0].commune_id.toString(), color = Color.White.copy(
-                                        alpha = 0.5f
-                                    ))
-                                }
-                            }
-                            Label("Ville", size = 16, fontWeight = FontWeight.Bold)
-                            Label("Kinshasa", color = Color.White.copy(
-                                    alpha = 0.5f
-                                ))
-                            Space(y = 9)
-                            HorizontalDivider()
-                            Space(y = 9)
-                            Row {
-                                Text("Vidage de la poubelle", color = Color.White.copy(
-                                    alpha = 0.5f
-                                ), fontSize = 16.sp)
-                                Space(x = 8)
-                                Icon(painterResource(R.drawable.trash), modifier = Modifier.size(23.dp), contentDescription = "", tint = Color.White)
-                            }
-                            Space(y = 4)
-
-                            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-                                MButtonIcon(
-                                    backgroundColor = Color.Red.copy(0.6f),
-                                    textColor = Color.White,
-                                    label = "Vidage",
-                                    click = {
-                                        stateTrash = true
-
-
-                                        if(!trashCleaner.isEmpty()){
-                                            if(trashCleaner.toList()[0]?.state_trash_id == 2){
-                                                titleMsg = "Information"
-                                                msg = "Votre poubelle est encours de nettoyage"
-                                                isShow = true
-                                                onclick = { isShow = false}
-                                            }
-                                            else{
-                                                if(isConnected){
-                                                    isActive = false
-                                                    coroutineScope.launch {
-                                                        delay(3000)
-                                                        val response = ClientKtor().postData(
-                                                            trashAction,
-                                                            Trash(client_id = clients.toList()[0].id, state_trash_id = 3)
-                                                        )
-                                                        val status = response.status.value
-                                                        when(status){
-                                                            in 200..299 ->{
-                                                                isActive = true
-                                                                val res = response.body<ResponseAPITrash>()
-                                                                Toast.makeText(context,res.message, Toast.LENGTH_LONG).show()
-                                                                msg = res.message
-                                                                titleMsg = "Success"
-
-                                                                isShow = true
-                                                                scope.launch {
-                                                                    StoreData(context).saveDataTrash(
-                                                                        res.data.id.let {
-                                                                            TrashClean(
-                                                                                id = it,
-                                                                                state_trash_id = res.data.state_trash_id,
-                                                                                client_id = res.data.client_id,
-                                                                                created_at = res.data.created_at
-                                                                            )
-                                                                        }
-                                                                    )
-                                                                }
-                                                                scope.launch {
-                                                                    StoreData(context).getDataTrash.collect{
-                                                                        if (it != null) {
-                                                                            trashCleaner[0] =it
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                            }
-                                                            in 500..599 ->{
-                                                                isActive = true
-                                                                msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
-                                                                isShow = true
-                                                            }
-                                                            in 400..499 ->{
-                                                                isActive = true
-                                                                val res = response.body<ResponseAPIGeneric>()
-                                                                msg = res.message
-                                                                isShow = true
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                                else{
-                                                    titleMsg = "Success"
-                                                    msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
-                                                    isShow = true
-                                                }
-                                            }
-                                        }
-                                        else{
-                                            if(isConnected){
-                                                coroutineScope.launch {
-                                                    delay(3000)
-                                                    isActive = false
-                                                    val response = ClientKtor().postData(
-                                                        trashAction,
-                                                        Trash(client_id = clients.toList()[0].id, state_trash_id = 3)
-                                                    )
-                                                    val status = response.status.value
-                                                    when(status){
-                                                        in 200..299 ->{
-                                                            val res = response.body<ResponseAPITrash>()
-                                                            Toast.makeText(context,res.message, Toast.LENGTH_LONG).show()
-                                                            msg = res.message
-                                                            titleMsg     = "Information"
-                                                            isShow = true
-                                                            isActive = true
-                                                            scope.launch {
-                                                                StoreData(context).saveDataTrash(
-                                                                    res.data.id.let {
-                                                                        TrashClean(
-                                                                            id = it,
-                                                                            state_trash_id = res.data.state_trash_id,
-                                                                            client_id = res.data.client_id,
-                                                                            created_at = res.data.created_at
-                                                                        )
-                                                                    }
-                                                                )
-                                                            }
-                                                            scope.launch {
-                                                                StoreData(context).getDataTrash.collect{
-                                                                    if (it != null) {
-                                                                        trashCleaner[0] =it
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        }
-                                                        in 500..599 ->{
-                                                            isActive = true
-                                                            msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
-                                                            isShow = true
-                                                        }
-                                                        in 400..499 ->{
-                                                            isActive = true
-                                                            val res = response.body<ResponseAPIGeneric>()
-                                                            msg = res.message
-                                                            isShow = true
-                                                        }
-
-                                                    }
-                                                }
-                                            }
-                                            else{
-                                               titleMsg = "Problème de connexion"
-                                                msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
-                                                isShow = true
-                                            }
-                                        }
-
-                                    },
-                                    icon = {
-                                        Icon(painterResource(R.drawable.arrow), modifier = Modifier.size(23.dp), contentDescription = null)
-                                    }
-                                )
-                                if (!trashCleaner.isEmpty()){
-                                    MButtonIcon(
-                                        textColor = Color.White,
-                                        backgroundColor = Color.Green.copy(0.4f),
-                                        label = "Valider",
-                                        click = {
-                                            if(trashCleaner[0]?.state_trash_id == 2){
-                                                titleMsg = "Information"
-                                                msg = "La validation de la poubelle est fait est géré par notre équipe"
-                                                isShow = true
-                                                onclick = { isShow = false}
-                                            }
-                                            else{
-                                                if(isConnected){
-                                                    isActive = false
-                                                    coroutineScope.launch {
-                                                        delay(3000)
-                                                        val response = ClientKtor().postData(
-                                                            "${trashClean}${clients.toList()[0].id}",
-                                                            Trash(client_id = clients.toList()[0].id, state_trash_id = 2)
-                                                        )
-                                                        val status = response.status.value
-                                                        when(status){
-                                                            in 200..299 ->{
-                                                                isActive = true
-                                                                val res = response.body<ResponseAPITrash>()
-                                                                titleMsg ="Success"
-                                                                msg = res.message
-                                                                isShow = true
-                                                                scope.launch {
-                                                                    StoreData(context).saveDataTrash(
-                                                                        res.data.id.let {
-                                                                            TrashClean(
-                                                                                id = it,
-                                                                                state_trash_id = res.data.state_trash_id,
-                                                                                client_id = res.data.client_id,
-                                                                                created_at = res.data.created_at
-                                                                            )
-                                                                        }
-                                                                    )
-                                                                }
-                                                                scope.launch {
-                                                                    StoreData(context).getDataTrash.collect{
-                                                                        if (it != null) {
-                                                                            trashCleaner[0] =it
-                                                                        }
-                                                                        //Toast.makeText(context,"SIZE = ${trashCleaner.size}",Toast.LENGTH_LONG).show()
-                                                                    }
-                                                                }
-
-                                                            }
-                                                            in 500..599 ->{
-                                                                isActive = true
-                                                                msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
-                                                                isShow = true
-                                                            }
-                                                            in 400..499 ->{
-                                                                isActive = true
-                                                                val res = response.body<ResponseAPIGeneric>()
-                                                                msg = res.message
-                                                                isShow = true
-                                                            }
-
-                                                        }
-                                                    }
-                                                }
-                                                else{
-                                                    msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
-                                                    isShow = true
-                                                    titleMsg = "Problème de connexion"
-                                                }
-                                            }
-                                        },
-                                        icon = {
-                                            Icon(painterResource(R.drawable.check), modifier = Modifier.size(23.dp), contentDescription = null)
-                                        }
-                                    )
-                                }
-                            }
-                            Space(y = 2)
-                        }
-                    }
-
+    LaunchedEffect(viewModel) {
+        viewModel.events.collect { event ->
+            if (event is HomeEvent.SignedOut) {
+                navC.navigate(ScreenRoute.Auth.name) {
+                    popUpTo(navC.graph.id) { inclusive = true }
                 }
             }
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                //Toast.makeText(context,"${trashCleaner.size}",Toast.LENGTH_LONG).show()
-                   Space(y = 20)
-               if (!trashCleaner.isEmpty()){
-                   var titleTrash = "Ma poubelle est propre"
-                   var colorTrash = Color.Blue.copy(alpha = 0.1F)
-                   var titleTrashRun = "Clean"
-                   var iconState = R.drawable.check
-                   when(trashCleaner[0]?.state_trash_id?.or(0)){
-                       3 -> {
-                           titleTrash = "Ma poubelle est pleine"
-                           titleTrashRun = "On arrive"
+        }
+    }
 
-                           iconState = R.drawable.run
-                           colorTrash  =  Color.Green.copy(alpha = 0.1F)
-                       }
-                       2 -> {
-                           titleTrash = "Nettoyage poubelle"
-                           titleTrashRun = "Ramassage"
-                           iconState = R.drawable.transfert
-                           colorTrash = Color.Red.copy(
-                               alpha = 0.1F,
-                           )
-                       }
-                       1 ->{
-                           titleTrash = "Ma poubelle est propre"
-                           titleTrashRun = "Clean"
-                           iconState = R.drawable.check
-                       }
-                   }
-                   Card(Modifier.padding(10.dp),colors = CardDefaults.cardColors(
-                       containerColor = Color.White
-                   ), elevation = CardDefaults.cardElevation(5.dp)) {
-                       Row(modifier = Modifier.fillMaxWidth().padding(5.dp),verticalAlignment = Alignment.CenterVertically) {
-                           Icon(painterResource(R.drawable.top), contentDescription = "", modifier = Modifier.size(30.dp), tint = Color.Red.copy(alpha = 0.5f))
-                           Spacer(Modifier.width(10.dp))
-                           Column() {
-                               Text(titleTrash)
-                           }
-                           Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.Right) {
-
-                               Box(modifier = Modifier.border(width = 10.dp, color = colorTrash,shape = RoundedCornerShape(52.dp)).scale(0.75f)){
-                                   Icon(painterResource(iconState), modifier = Modifier.size(42.dp), contentDescription = "icon",tint = Color.Black)
-                               }
-                               Space(x = 4)
-                               Column {
-                                   Text(titleTrashRun, Modifier.absoluteOffset(y = 12.dp))
-                               }
-
-                           }
-                       }
-                   }
-               }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppBackground),
+    ) {
+        val client = state.client
+        if (!state.ready || client == null) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AppLogo(size = 84.dp, ring = BrandBlueLight)
+                Spacer(Modifier.height(12.dp))
+                Text("CasaClean", color = BrandBlueDeep, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                if (state.ready && client == null) {
+                    Spacer(Modifier.height(16.dp))
+                    PrimaryButton(
+                        text = "Se connecter",
+                        onClick = {
+                            navC.navigate(ScreenRoute.Auth.name) {
+                                popUpTo(navC.graph.id) { inclusive = true }
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 32.dp),
+                    )
+                }
             }
-            Space(y = 20)
-            ModernCarousel()
-            if(isShow){
-                MAlertDialog(
-                    dialogTitle = titleMsg,
-                    dialogText =  msg,
-                    onDismissRequest = {
-                        isShow = false
-                    },
-                    onConfirmation = onclick
+        } else {
+            Column(Modifier.fillMaxSize()) {
+                ClientHeader(
+                    client = client,
+                    onRefresh = { viewModel.refresh(isConnected) },
+                    onSignOut = viewModel::askSignOut,
+                )
+                if (state.loading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = Color.White,
+                        trackColor = BrandBlueDark,
+                    )
+                }
+                if (!isConnected) {
+                    Text(
+                        text = "Hors ligne. Les actions de collecte attendent le réseau.",
+                        color = BrandBlueDeep,
+                        fontSize = 13.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Warning.copy(alpha = 0.16f))
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                    )
+                }
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(tween(420)) + slideInVertically(tween(480)) { it / 8 },
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .navigationBarsPadding()
+                            .padding(bottom = 28.dp),
+                    ) {
+                        SectionLabel("À la une")
+                        CasaCarousel()
+                        SectionLabel("Souscription")
+                        WhiteCard {
+                            Text(
+                                text = client.code.ifBlank { "Compte client" },
+                                color = BrandBlue,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.sp,
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            SubscriptionBlock(souscription = client.subscription())
+                            if (!client.created_at.isNullOrBlank()) {
+                                Text(
+                                    text = "Client depuis le ${formatApiDate(client.created_at)}",
+                                    color = InkMuted,
+                                    fontSize = 12.sp,
+                                )
+                            }
+                        }
+                        SectionLabel("Adresse")
+                        WhiteCard {
+                            val address = client.addresses().firstOrNull()
+                            InfoRow(Icons.Default.Place, "Quartier", address?.quartier.orEmpty())
+                            InfoRow(Icons.Default.Place, "Avenue", address?.avenue.orEmpty())
+                            InfoRow(Icons.Default.Home, "Parcelle", address?.numero_parcelle.orEmpty())
+                            InfoRow(Icons.Default.Place, "Commune", communeLabel(address?.commune_id))
+                            InfoRow(Icons.Default.Home, "Ville", "Kinshasa")
+                            InfoRow(Icons.Default.Phone, "Téléphone", client.telephone)
+                        }
+                        SectionLabel("Poubelle")
+                        TrashCard(trash = state.trash)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            MButtonIcon(
+                                modifier = Modifier.weight(1f),
+                                backgroundColor = Danger.copy(alpha = 0.9f),
+                                textColor = Color.White,
+                                label = "Vidage",
+                                enabled = !state.loading,
+                                click = { viewModel.requestEmpty(isConnected) },
+                                icon = {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                },
+                            )
+                            if (state.trash != null) {
+                                MButtonIcon(
+                                    modifier = Modifier.weight(1f),
+                                    backgroundColor = Success,
+                                    textColor = Color.White,
+                                    label = "Valider",
+                                    enabled = !state.loading,
+                                    click = { viewModel.validateClean(isConnected) },
+                                    icon = {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(18.dp),
+                                        )
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        val dialog = state.dialog
+        if (dialog != null) {
+            MAlertDialog(
+                dialogTitle = dialog.title,
+                dialogText = dialog.message,
+                confirmText = dialog.confirmLabel,
+                onDismissRequest = viewModel::dismissDialog,
+                onConfirmation = {
+                    if (dialog.kind == DialogKind.ConfirmSignOut) {
+                        viewModel.onDialogConfirm()
+                    } else {
+                        viewModel.dismissDialog()
+                    }
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun ClientHeader(
+    client: Client,
+    onRefresh: () -> Unit,
+    onSignOut: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Brush.verticalGradient(listOf(BrandBlue, BrandBlueDark)))
+            .statusBarsPadding()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AppLogo(size = 56.dp)
+            Column(
+                modifier = Modifier
+                    .padding(start = 14.dp)
+                    .weight(1f),
+            ) {
+                Text(
+                    text = "CasaClean",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                )
+                Text(
+                    text = "Bonjour ${client.displayName()}",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp,
                 )
             }
-
+            IconButton(onClick = onSignOut) {
+                Icon(
+                    painter = painterResource(R.drawable.signout),
+                    contentDescription = "Se déconnecter",
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp),
+                )
+            }
+            IconButton(onClick = onRefresh) {
+                Icon(
+                    painter = painterResource(R.drawable.transfert),
+                    contentDescription = "Actualiser",
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp),
+                )
+            }
         }
-        Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Top) {
-            if(!isActive){
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth(),
+        if (client.code.isNotBlank()) {
+            Surface(
+                color = Color.White.copy(alpha = 0.16f),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.padding(top = 12.dp),
+            ) {
+                Text(
+                    text = client.code,
                     color = Color.White,
-                    trackColor =Color(0xFF070524),
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 )
             }
         }
@@ -561,7 +322,46 @@ fun HomePageBody(navC: NavHostController, isConnected: Boolean) {
 }
 
 @Composable
-@Preview
-fun HomePagePreview(){
-//    HomePageBody(navC = remem, isConnected = false)
+private fun WhiteCard(content: @Composable () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(1.dp),
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun TrashCard(trash: TrashClean?) {
+    val status = trashStatus(trash?.state_trash_id)
+    val tone = when (status.tone) {
+        TrashTone.Clean -> Success
+        TrashTone.Waiting -> Warning
+        TrashTone.Full -> Danger
+        TrashTone.Unknown -> BrandBlue
+    }
+    WhiteCard {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(color = tone.copy(alpha = 0.14f), shape = RoundedCornerShape(16.dp)) {
+                Icon(
+                    painter = painterResource(R.drawable.trash),
+                    contentDescription = null,
+                    tint = tone,
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .size(26.dp),
+                )
+            }
+            Column(Modifier.padding(start = 12.dp).weight(1f)) {
+                Text(status.title, color = Ink, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(status.detail, color = InkMuted, fontSize = 13.sp)
+            }
+        }
+    }
 }

@@ -2,5 +2,10 @@ package com.partners.hdfils_recolte.domain.route
 
 enum class ScreenRoute {
     Auth,
-    Home
+    Register,
+    Home,
+}
+
+fun startRoute(loggedIn: Boolean): ScreenRoute {
+    return if (loggedIn) ScreenRoute.Home else ScreenRoute.Auth
 }

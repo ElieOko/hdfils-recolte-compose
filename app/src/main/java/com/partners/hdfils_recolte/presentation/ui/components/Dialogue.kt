@@ -31,6 +31,7 @@ fun MAlertDialog(
     onConfirmation: () -> Unit = {},
     dialogTitle: String = "Success",
     dialogText: String = "Magique",
+    confirmText: String = "Ok",
     icon: ImageVector = Icons.Default.Notifications,
 ) {
     val rainbowColorsBrush = remember {
@@ -46,7 +47,7 @@ fun MAlertDialog(
     AlertDialog(
         icon = {
             Image(
-                painter = painterResource(R.drawable.logo_gris),
+                painter = painterResource(R.drawable.logo_casa),
                 contentScale = ContentScale.Crop,
                 contentDescription = "",
                 modifier = Modifier
@@ -72,7 +73,7 @@ fun MAlertDialog(
                     onConfirmation()
                 }
             ) {
-                Text("Ok")
+                Text(confirmText)
             }
         },
         dismissButton = {
