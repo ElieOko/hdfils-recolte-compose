@@ -1,23 +1,23 @@
 package com.partners.hdfils_recolte.presentation.ui.components
 
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,140 +37,127 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import com.partners.hdfils_recolte.R
 import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlue
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlueDeep
+import com.partners.hdfils_recolte.presentation.ui.theme.Line
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ImageCarousel(
-    modifier: Modifier = Modifier
-) {
-    val imageList = listOf(
-        R.drawable.sac,
-        R.drawable.affiche,
-        R.drawable.detergeant,
-        R.drawable.poubelle,
-        R.drawable.car,
-    )
+data class PromoSlide(
+    @DrawableRes val image: Int,
+    val title: String,
+    val caption: String,
+)
 
-    val pagerState = rememberPagerState { imageList.size }
-
-    Column(
-        modifier
-            .defaultMinSize(minHeight = 300.dp)
-            .fillMaxWidth()
-    ) {
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxWidth(),
-            pageSpacing = 10.dp,
-            contentPadding = PaddingValues(horizontal = 30.dp)
-        ) { page ->
-            Image(
-                painter = painterResource(id = imageList[page]),
-                contentDescription = "",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-                    .graphicsLayer {
-                        val pageOffset =
-                            (pagerState.currentPage - page + pagerState.currentPageOffsetFraction).absoluteValue
-
-                        lerp(
-                            start = 75.dp,
-                            stop = 100.dp,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        ).also { scale ->
-                            scaleY = scale / 100.dp
-                        }
-                    },
-                contentScale = ContentScale.Crop
-            )
-        }
-
-    }
-
-}
-
-@Composable
-@Preview
-fun ModernCarousel(
-    modifier: Modifier = Modifier,
-    imageList: List<Int> = listOf(
-        R.drawable.sac,
-        R.drawable.affiche,
-        R.drawable.detergeant,
-        R.drawable.poubelle,
-        R.drawable.car
+fun casaSlides(): List<PromoSlide> = listOf(
+    PromoSlide(
+        image = R.drawable.promo_services,
+        title = "Tous vos services, une seule application",
+        caption = "Plomberie, électricité, ménage et le suivi de votre domicile.",
     ),
-    texts: List<String> = listOf(
-        "Propreté et écologie : ensemble pour un avenir durable",
-        "Kin ezo bonga",
-        "Propreté et style : faites le choix intelligent",
-        "Votre allié pour un quotidien impeccable",
-        "Optez pour la propreté : un choix responsable"
-    )
+    PromoSlide(
+        image = R.drawable.promo_app,
+        title = "CasaClean dans votre poche",
+        caption = "Des professionnels fiables, tout près de chez vous.",
+    ),
+    PromoSlide(
+        image = R.drawable.promo_collecte,
+        title = "Collecte des déchets à domicile",
+        caption = "Une poubelle à la maison, un ramassage jusqu'à votre parcelle.",
+    ),
+)
+
+@Composable
+fun CasaCarousel(
+    slides: List<PromoSlide> = casaSlides(),
+    modifier: Modifier = Modifier,
 ) {
-    val pagerState: PagerState = rememberPagerState { imageList.size }
+    val pagerState = rememberPagerState { slides.size }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(pagerState) {
         while (true) {
-            delay(3000) // Délai de 3 secondes
-            pagerState.animateScrollToPage((pagerState.currentPage + 1) % imageList.size)
+            delay(4600)
+            if (!pagerState.isScrollInProgress && slides.isNotEmpty()) {
+                val next = (pagerState.currentPage + 1) % slides.size
+                pagerState.animateScrollToPage(
+                    page = next,
+                    animationSpec = tween(durationMillis = 880, easing = FastOutSlowInEasing),
+                )
+            }
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
+    Column(modifier = modifier.fillMaxWidth()) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
-            pageSpacing = 12.dp,
-            contentPadding = PaddingValues(horizontal = 20.dp)
+            pageSpacing = 14.dp,
+            contentPadding = PaddingValues(horizontal = 28.dp),
         ) { page ->
+            val offset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+            val distance = offset.absoluteValue.coerceIn(0f, 1f)
             Card(
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(24.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(220.dp)
+                    .height(286.dp)
+                    .graphicsLayer {
+                        val scale = lerp(0.9f, 1f, 1f - distance)
+                        scaleX = scale
+                        scaleY = scale
+                        alpha = lerp(0.62f, 1f, 1f - distance)
+                        rotationY = offset * -16f
+                        cameraDistance = 18f * density
+                    },
             ) {
-                Box {
+                Box(Modifier.fillMaxSize()) {
                     Image(
-                        painter = painterResource(id = imageList[page]),
-                        contentDescription = texts[page],
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
+                        painter = painterResource(slides[page].image),
+                        contentDescription = slides[page].title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                translationX = offset * 36.dp.toPx()
+                                scaleX = 1.08f
+                                scaleY = 1.08f
+                            },
                     )
                     Box(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
+                            .height(132.dp)
                             .background(
                                 Brush.verticalGradient(
-                                    listOf(Color.Transparent, Color.Black.copy(alpha = 0.72f))
-                                )
-                            )
-                            .padding(start = 16.dp, end = 16.dp, top = 36.dp, bottom = 14.dp)
+                                    listOf(Color.Transparent, BrandBlueDeep.copy(alpha = 0.94f)),
+                                ),
+                            ),
+                    )
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(horizontal = 16.dp, vertical = 14.dp),
                     ) {
                         Text(
-                            text = texts[page],
+                            text = slides[page].title,
                             color = Color.White,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 15.sp,
-                            lineHeight = 20.sp,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp,
+                        )
+                        Text(
+                            text = slides[page].caption,
+                            color = Color.White.copy(alpha = 0.9f),
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(top = 4.dp),
                         )
                     }
                 }
@@ -179,21 +167,30 @@ fun ModernCarousel(
         Row(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                .padding(top = 12.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            repeat(imageList.size) { index ->
+            slides.indices.forEach { index ->
                 val selected = pagerState.currentPage == index
-                val dotWidth by animateDpAsState(
-                    targetValue = if (selected) 18.dp else 6.dp,
-                    label = "carousel-dot"
+                val width by animateDpAsState(
+                    targetValue = if (selected) 22.dp else 8.dp,
+                    animationSpec = tween(320),
+                    label = "indicator-$index",
                 )
                 Box(
                     modifier = Modifier
-                        .height(6.dp)
-                        .width(dotWidth)
+                        .size(width = width, height = 8.dp)
                         .clip(CircleShape)
-                        .background(if (selected) BrandBlue else Color(0xFFD0D7E0))
+                        .background(if (selected) BrandBlue else Line)
+                        .clickable {
+                            scope.launch {
+                                pagerState.animateScrollToPage(
+                                    page = index,
+                                    animationSpec = tween(520, easing = FastOutSlowInEasing),
+                                )
+                            }
+                        },
                 )
             }
         }

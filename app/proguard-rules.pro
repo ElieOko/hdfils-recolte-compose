@@ -20,3 +20,14 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -dontwarn org.slf4j.impl.StaticLoggerBinder
+
+-keepattributes Signature, InnerClasses, EnclosingMethod, *Annotation*
+-keep class com.partners.hdfils_recolte.domain.models.** { *; }
+-keepclassmembers class com.partners.hdfils_recolte.domain.models.** {
+    <init>(...);
+}
+-keep class com.partners.hdfils_recolte.**$$serializer { *; }
+-keepclassmembers class com.partners.hdfils_recolte.** {
+    *** Companion;
+}
+-dontwarn kotlinx.serialization.**

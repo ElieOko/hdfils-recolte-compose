@@ -81,14 +81,14 @@ fun AnimatedBackgroundShapes() {
     Canvas(modifier = Modifier.fillMaxSize()) {
         // Dessiner le premier cercle animé
         drawCircle(
-            color = Color(0xFF6C63FF).copy(alpha = 0.2f),
+            color = Color(0xFF307EC7).copy(alpha = 0.16f),
             radius = circle1Radius,
             center = Offset(circle1OffsetX, circle1OffsetY)
         )
 
         // Dessiner le deuxième cercle animé
         drawCircle(
-            color = Color(0xFF6C63FF).copy(alpha = 0.2f),
+            color = Color(0xFF307EC7).copy(alpha = 0.16f),
             radius = circle2Radius,
             center = Offset(circle2OffsetX, circle2OffsetY)
         )

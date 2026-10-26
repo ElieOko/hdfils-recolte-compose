@@ -33,6 +33,7 @@ fun MAlertDialog(
     onConfirmation: () -> Unit = {},
     dialogTitle: String = "Success",
     dialogText: String = "Magique",
+    confirmText: String = "Ok",
     icon: ImageVector = Icons.Default.Notifications,
     confirmText: String = "OK",
     dismissText: String = "Fermer",
@@ -50,7 +51,7 @@ fun MAlertDialog(
     AlertDialog(
         icon = {
             Image(
-                painter = painterResource(R.drawable.logo_gris),
+                painter = painterResource(R.drawable.logo_casa),
                 contentScale = ContentScale.Crop,
                 contentDescription = "",
                 modifier = Modifier
@@ -76,7 +77,7 @@ fun MAlertDialog(
                     onConfirmation()
                 }
             ) {
-                Text(confirmText, color = BrandBlue, fontWeight = FontWeight.SemiBold)
+                Text(confirmText)
             }
         },
         dismissButton = {

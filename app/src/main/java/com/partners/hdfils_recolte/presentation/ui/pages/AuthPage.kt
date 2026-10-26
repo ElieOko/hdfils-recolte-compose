@@ -409,6 +409,83 @@ private fun AuthScreen(
                                 focusManager.clearFocus()
                                 onSubmit()
                             }
+                            if(isValidPhoneNumber(phoneNumber = telephone) && avenue.isNotEmpty() ){
+                                if(isConnected){
+                                    coroutineScope.launch {
+                                        isActive = false
+                                        delay(3000)
+                                        val response = ClientKtor().postData(clientAuth,
+                                            ClientAuth(telephone = telephone, avenue = avenue)
+                                        )
+                                        val status = response.status.value
+                                        when(status){
+                                            in 200..299 ->{
+                                                isActive = true
+                                                val res = response.body<ResponseAPI>()
+                                                scope.launch {
+                                                    StoreData(context).getDataClient.collect{
+                                                        if(it != null){
+                                                            if (it.telephone == telephone && it.address_client?.get(0)?.avenue == avenue){
+                                                                //
+                                                            }
+                                                            else{
+                                                                StoreData(context).delete()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                scope.launch {
+                                                    StoreData(context).saveDataClientAuth(ClientAuth(telephone,avenue))
+                                                    StoreData(context).saveDataClient(
+                                                        res.client?.id?.let {
+                                                            Client(
+                                                                id = it,
+                                                                nom = res.client.nom,
+                                                                prenom = res.client.prenom,
+                                                                telephone = res.client.telephone,
+                                                                address_client = listOf<Address>(Address(
+                                                                    commune_id = res.client.address_client?.get(0)?.commune_id
+                                                                        ?: 0,
+                                                                    avenue = res.client.address_client?.get(0)?.avenue?:"",
+                                                                    quartier = res.client.address_client?.get(0)?.quartier?:"",
+                                                                    numero_parcelle = res.client.address_client?.get(0)?.numero_parcelle?:""
+                                                                )),
+                                                            )
+                                                        }
+                                                    )
+                                                    navC.navigate(route = ScreenRoute.Home.name){
+                                                        popUpTo(navC.graph.id){
+                                                            inclusive = true
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            in 500..599 ->{
+                                                isActive = true
+                                                msg = "Erreur serveur réssayer plus tard nous resolvons ce problème"
+                                                isShow = true
+                                            }
+                                            in 400..499 ->{
+                                                isActive = true
+                                                val res = response.body<ResponseAPIGeneric>()
+                                                msg = res.message
+                                                isShow = true
+                                            }
+                                        }
+                                    }
+                                }
+                                else{
+                                    msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
+                                    titleMsg = "Problème de connexion"
+                                    isShow = true
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor =  Color.Black,
+                            disabledContentColor = Color(0xFF080624),
+                            disabledContainerColor = Color(0xFF080624)
                         ),
                         shape = RoundedCornerShape(14.dp),
                         colors = fieldColors

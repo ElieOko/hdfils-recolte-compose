@@ -78,17 +78,9 @@ import com.partners.hdfils_recolte.domain.models.TrashClean
 import com.partners.hdfils_recolte.domain.route.ScreenRoute
 import com.partners.hdfils_recolte.presentation.ui.components.ConnectionBanner
 import com.partners.hdfils_recolte.presentation.ui.components.MAlertDialog
-import com.partners.hdfils_recolte.presentation.ui.components.ModernCarousel
-import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlue
-import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlueDeep
-import com.partners.hdfils_recolte.presentation.ui.theme.BrandGold
-import com.partners.hdfils_recolte.presentation.ui.theme.BrandStatusBar
-import com.partners.hdfils_recolte.presentation.ui.theme.HdfilsrecolteTheme
-import com.partners.hdfils_recolte.presentation.ui.theme.Ink
-import com.partners.hdfils_recolte.presentation.ui.theme.InkMuted
-import com.partners.hdfils_recolte.presentation.ui.theme.Line
-import com.partners.hdfils_recolte.presentation.ui.theme.PageBackground
-import com.partners.hdfils_recolte.presentation.ui.theme.Success
+import com.partners.hdfils_recolte.presentation.ui.components.MButtonIcon
+//import com.partners.hdfils_recolte.presentation.ui.components.ModernCarousel
+import com.partners.hdfils_recolte.presentation.ui.components.Space
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.CancellationException
@@ -116,20 +108,78 @@ fun HomePageBody(navC: NavHostController, isConnected: Boolean) {
     val trashCleaner = remember { mutableStateListOf<TrashClean>() }
     var onConfirm by remember { mutableStateOf<() -> Unit>({ isShow = false }) }
 
-    fun showDialog(
-        title: String,
-        message: String,
-        confirmLabel: String = "OK",
-        dismissLabel: String = "Fermer",
-        confirm: () -> Unit = { isShow = false }
-    ) {
-        titleMsg = title
-        msg = message
-        confirmText = confirmLabel
-        dismissText = dismissLabel
-        onConfirm = confirm
-        isShow = true
-    }
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        titleMsg = "Problème de connexion"
+                                        msg = "Vous n'êtes pas connecté veuillez vérifier votre connexion !!!"
+                                        isShow = true
+                                    }
+                                }
+                                catch (e : Exception){
+                                    Toast.makeText(context,e.message,Toast.LENGTH_LONG).show()
+                                }
+                            },
+                            onclickSignout = {
+                                isShow = true
+                                titleMsg = "Information"
+                                msg = "Voulez-vous vraiment vous déconnectez ??"
+                                onclick = {
+                                    isShow = false
+                                    navC.navigate(route = ScreenRoute.Auth.name){
+                                        popUpTo(navC.graph.id){
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                Column(Modifier.padding(1.dp).absoluteOffset(y = (-15).dp)) {
+                    if (!clients.isEmpty()){
+                        Column(Modifier.padding(20.dp)) {
+                            Space(y = 2)
+                            Row(Modifier.fillMaxWidth()) {
+                                Column {
+                                    Label("Quartier", size = 16, fontWeight = FontWeight.Bold)
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.quartier?:"", color = Color.White.copy(
+                                        alpha = 0.5f
+                                    ))
+                                }
+                                Space(x=15)
+                                Column {
+                                    Label("Avenue", size = 16, fontWeight = FontWeight.Bold)
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.avenue?:"",color = Color.White.copy(
+                                        alpha = 0.5f
+                                    ))
+                                }
+                                Space(x=15)
+                                Column {
+                                    Label("Commune", size = 16, fontWeight = FontWeight.Bold)
+                                    Label(
+                                        clients.toList()[0].address_client?.get(0)?.commune_id.toString(), color = Color.White.copy(
+                                        alpha = 0.5f
+                                    ))
+                                }
+                            }
+                            Label("Ville", size = 16, fontWeight = FontWeight.Bold)
+                            Label("Kinshasa", color = Color.White.copy(
+                                    alpha = 0.5f
+                                ))
+                            Space(y = 9)
+                            HorizontalDivider()
+                            Space(y = 9)
+                            Row {
+                                Text("Vidage de la poubelle", color = Color.White.copy(
+                                    alpha = 0.5f
+                                ), fontSize = 16.sp)
+                                Space(x = 8)
+                                Icon(painterResource(R.drawable.trash), modifier = Modifier.size(23.dp), contentDescription = "", tint = Color.White)
+                            }
+                            Space(y = 4)
 
     fun publishTrash(trash: TrashClean) {
         if (trashCleaner.isEmpty()) trashCleaner.add(trash) else trashCleaner[0] = trash
@@ -558,23 +608,14 @@ private fun TrashStatusCard(trash: TrashClean?) {
                     modifier = Modifier.size(26.dp)
                 )
             }
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp)
-            ) {
-                Text(
-                    text = presentation.title,
-                    color = Ink,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = if (trash == null) {
-                        "Demandez un vidage dès que votre poubelle est pleine."
-                    } else {
-                        presentation.detail
+            Space(y = 20)
+            //ModernCarousel()
+            if(isShow){
+                MAlertDialog(
+                    dialogTitle = titleMsg,
+                    dialogText =  msg,
+                    onDismissRequest = {
+                        isShow = false
                     },
                     color = InkMuted,
                     fontSize = 13.sp,
