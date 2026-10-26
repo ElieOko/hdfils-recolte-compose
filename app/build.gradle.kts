@@ -54,7 +54,8 @@ dependencies {
     //
     implementation("com.google.code.gson:gson:2.8.7")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
+// Source: https://mvnrepository.com/artifact/androidx.compose.material/material-icons-extended
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.foundation.pager)
     implementation(libs.androidx.navigation.compose)
     //Coroutines
@@ -84,6 +85,7 @@ dependencies {
     implementation(libs.ktor.client.logging.jvm)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

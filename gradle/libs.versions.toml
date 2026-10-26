@@ -1,34 +1,35 @@
 [versions]
 activityKtx = "1.10.1"
-agp = "8.9.1"
-kotlin = "2.1.0"
-coreKtx = "1.15.0"
+agp = "8.9.3"
+kotlin = "2.2.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
-composeBom = "2025.03.01"
-koinAndroidxCompose = "3.4.0"
-coilCompose = "2.4.0"
-koinAndroid = "3.4.0"
-kotlinReflect = "2.0.20"
-ktorClientAndroidVersion = "2.3.12"
-kotlinxCoroutinesAndroid = "1.8.0"
-kotlinxCoroutinesCore = "1.8.0"
-kotlinxCoroutinesPlayServices = "1.7.3"
-kotlinxSerializationJson = "1.5.1"
-ktorClientContentNegotiation = "2.3.12"
-ktorClientContentNegotiationVersion = "2.3.12"
-ktorClientCore = "2.3.12"
-ktorClientLoggingJvm = "2.3.10"
-ktorClientSerialization = "2.3.10"
-ktorClientAndroid = "2.3.12"
-ktorSerializationKotlinxJson = "2.3.10"
+composeBom = "2025.07.00"
+koinAndroidxCompose = "4.1.0"
+coilCompose = "2.7.0"
+koinAndroid = "4.1.0"
+kotlinReflect = "2.0.21"
+ktorClientAndroidVersion = "3.2.2"
+kotlinxCoroutinesAndroid = "1.10.2"
+kotlinxCoroutinesCore = "1.10.2"
+kotlinxCoroutinesPlayServices = "1.10.2"
+kotlinxSerializationJson = "1.9.0"
+ktorClientContentNegotiation = "3.2.2"
+ktorClientContentNegotiationVersion = "3.2.2"
+ktorClientCore = "3.2.2"
+ktorClientLoggingJvm = "3.2.2"
+ktorClientSerialization = "3.2.2"
+ktorClientAndroid = "3.2.2"
+ktorSerializationKotlinxJson = "3.2.2"
 lifecycleExtensions = "2.2.0"
-lifecycleRuntimeKtxVersion = "2.8.7"
-navigationCompose = "2.8.9"
-pagerVersion = "1.7.8"
+lifecycleRuntimeKtxVersion = "2.9.2"
+navigationCompose = "2.9.2"
+pagerVersion = "1.8.3"
+material3 = "1.4.0-alpha18"
 
 [libraries]
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -53,7 +54,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
