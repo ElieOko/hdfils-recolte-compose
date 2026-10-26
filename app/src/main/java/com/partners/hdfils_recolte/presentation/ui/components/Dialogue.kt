@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -21,8 +20,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.partners.hdfils_recolte.R
+import com.partners.hdfils_recolte.presentation.ui.theme.BrandBlue
+import com.partners.hdfils_recolte.presentation.ui.theme.InkMuted
 
 @Composable
 @Preview
@@ -32,6 +34,8 @@ fun MAlertDialog(
     dialogTitle: String = "Success",
     dialogText: String = "Magique",
     icon: ImageVector = Icons.Default.Notifications,
+    confirmText: String = "OK",
+    dismissText: String = "Fermer",
 ) {
     val rainbowColorsBrush = remember {
         Brush.sweepGradient(
@@ -72,7 +76,7 @@ fun MAlertDialog(
                     onConfirmation()
                 }
             ) {
-                Text("Ok")
+                Text(confirmText, color = BrandBlue, fontWeight = FontWeight.SemiBold)
             }
         },
         dismissButton = {
@@ -81,7 +85,7 @@ fun MAlertDialog(
                     onDismissRequest()
                 }
             ) {
-                Text("Fermer")
+                Text(dismissText, color = InkMuted)
             }
         }
     )
