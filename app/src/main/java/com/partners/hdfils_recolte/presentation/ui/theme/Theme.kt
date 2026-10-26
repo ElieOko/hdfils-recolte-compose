@@ -26,6 +26,7 @@ private val LightColorScheme = lightColorScheme(
     onError = Color.White,
 )
 
+@Suppress("UNUSED_PARAMETER")
 @Composable
 fun CasaCleanTheme(
     content: @Composable () -> Unit,
